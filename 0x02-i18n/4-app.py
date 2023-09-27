@@ -21,24 +21,26 @@ babel = Babel(app)
 app.config.from_object(Config)
 
 
-@babel.localeselector
+@babel.locale_selector
 def get_locale():
     """
     Best match language
     """
-    locale = request.args.get("locale")
-    if locale in app.config['LANGUAGES']:
-        return locale
+    if 'locale' in request.args:
+        requested_locale = request.args.get('locale')
+        if requested_locale in app.config['LANGUAGES']:
+            return requested_locale
+
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 @app.route("/", methods=["GET"], strict_slashes=False)
 def home():
-    """
-    home route
-    return: template
-    """
-    return render_template('4-index.html')
+    # Generate URLs with 'locale' parameter
+    fr_url = url_for('home', locale='fr')
+    en_url = url_for('home', locale='en')
+
+    return render_template('4-index.html', fr_url=fr_url, en_url=en_url)
 
 
 if __name__ == "__main__":
